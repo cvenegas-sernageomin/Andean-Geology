@@ -116,6 +116,13 @@ L.control.layers(bases,null,{position:'topright'}).addTo(map);
 map.createPane('pane_poly').style.zIndex = 400;
 map.createPane('pane_marc').style.zIndex = 420;
 const POLY = {pane:'pane_poly'}, MARC = {pane:'pane_marc'};
+/* ancla de trabajos nacionales: capital/punto representativo (no el centroide geometrico del pais) */
+const NAC_ANCHOR = {
+  "Chile":[-33.45,-70.67], "Argentina":[-34.6,-58.4], "Bolivia":[-16.5,-68.15], "Peru":[-12.05,-77.04],
+  "Ecuador":[-0.18,-78.47], "Colombia":[4.71,-74.07], "Venezuela":[10.48,-66.9], "Brazil":[-15.79,-47.88],
+  "Uruguay":[-34.9,-56.16], "Paraguay":[-25.26,-57.58], "Mexico":[19.43,-99.13], "Costa Rica":[9.93,-84.08],
+  "Antártica":[-75,-60], "Antarctica":[-75,-60]
+};
 const POPUP_OPTS = {maxWidth:720};
 
 /* ---------- estilos por tipo ---------- */
@@ -195,8 +202,8 @@ function aplicarFiltros(){
       grupos.reg.addLayer(L.circleMarker(c,Object.assign({},EST.regSym,MARC)).bindPopup(popupHTML(p), POPUP_OPTS));
       contadores.reg++;
 }else{
-      const c = g.type==='Point' ? [g.coordinates[1],g.coordinates[0]] : geometriaCentro(g);
-      if(c){grupos.nac.addLayer(L.circleMarker(c,Object.assign({},EST.nac,MARC)).bindPopup(popupHTML(p), POPUP_OPTS));contadores.nac++;}
+      const anc = NAC_ANCHOR[p.lugar] || (g.type==='Point' ? [g.coordinates[1],g.coordinates[0]] : geometriaCentro(g));
+      if(anc){grupos.nac.addLayer(L.circleMarker(anc,Object.assign({},EST.nac,MARC)).bindPopup(popupHTML(p), POPUP_OPTS));contadores.nac++;}
     }
   });
   document.getElementById('n-punto').textContent='('+contadores.punto+')';
