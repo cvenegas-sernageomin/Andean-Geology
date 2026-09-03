@@ -82,7 +82,7 @@
         <label class="capa"><input type="checkbox" id="chk-punto" checked/><span class="sw punto"></span>
           Puntos <span class="n">(estudios puntuales)</span> <span class="count" id="n-punto"></span></label>
         <label class="capa"><input type="checkbox" id="chk-reg"/><span class="sw reg"></span>
-          Regionales <span class="n">(polígono + símbolo)</span> <span class="count" id="n-reg"></span></label>
+          Regionales <span class="n">(punto naranjo, agrupados)</span> <span class="count" id="n-reg"></span></label>
         <label class="capa"><input type="checkbox" id="chk-nac"/><span class="sw nac"></span>
           Nacionales <span class="n">(punto azul, agrupados)</span> <span class="count" id="n-nac"></span></label>
         <button id="leybtn">ⓘ Leyenda y fuentes</button>
@@ -93,12 +93,12 @@
 <div id="legmodal"><div id="legwrap"><button id="legclose">✕ Cerrar</button>
   <h3>Leyenda — Visor Andean Geology</h3>
   <div class="fila"><span class="sw punto"></span> Punto: estudio local (mina, volcán, afloramiento, sección)</div>
-  <div class="fila"><span class="sw reg"></span> Regional: área de estudio (polígono naranjo) + símbolo rojo central</div>
+  <div class="fila"><span class="sw reg"></span> Regional: área de estudio (punto naranjo, agrupados)</div>
   <div class="fila"><span class="sw nac"></span> Nacional: revisión de país completo (punto azul grande)</div>
   <p style="font-size:12px;color:#475569;margin-top:10px">922 artículos de <b>Andean Geology</b> (Revista Geológica de Chile, 1974–2027)
   georreferenciados desde sus abstracts (coordenadas explícitas o gazetteer). Cada popup trae el abstract y el enlace
-  de descarga del PDF (revista de acceso abierto CC-BY). CRS WGS84. Cuando varios trabajos nacionales coinciden en el
-  mismo país, se agrupan en un marcador con número: haz clic en zoom máximo para desplegarlos en abanico.
+  de descarga del PDF (revista de acceso abierto CC-BY). CRS WGS84. Cuando varios trabajos regionales o
+  nacionales coinciden, se agrupan en un marcador con número: haz clic en zoom máximo para desplegarlos en abanico.
 </div></div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
@@ -128,8 +128,7 @@ const POPUP_OPTS = {maxWidth:720};
 /* ---------- estilos por tipo ---------- */
 const EST = {
   punto: {radius:5,color:'#b8860b',weight:1.5,fillColor:'#f5c518',fillOpacity:.9},
-  regSym: {radius:5,color:'#b71c1c',weight:1.5,fillColor:'#e53935',fillOpacity:.9},
-  regPoly: {color:'#ff8c00',weight:2,fillColor:'#ff8c00',fillOpacity:.10},
+  reg: {radius:7,color:'#b71c1c',weight:1.5,fillColor:'#e53935',fillOpacity:.95},
   nac: {radius:9,color:'#1a4f8b',weight:1.5,fillColor:'#4285f4',fillOpacity:.95}
 };
 
@@ -171,9 +170,9 @@ function geojsonToLatLngs(geom){
 
 /* ---------- datos y capas ---------- */
 let DATOS=null;
-const grupos={punto:L.layerGroup(),reg:L.layerGroup(),
-              nac:L.markerClusterGroup({pane:'pane_marc',spiderfyOnMaxZoom:true,
-                                        showCoverageOnHover:false,maxClusterRadius:60})};
+const grupos={punto:L.layerGroup(),
+              reg:L.markerClusterGroup({pane:'pane_marc',spiderfyOnMaxZoom:true,showCoverageOnHover:false,maxClusterRadius:60}),
+              nac:L.markerClusterGroup({pane:'pane_marc',spiderfyOnMaxZoom:true,showCoverageOnHover:false,maxClusterRadius:60})};
 const contadores={punto:0,reg:0,nac:0};
 
 function filtroActivo(){
@@ -193,15 +192,11 @@ function aplicarFiltros(){
     if(p.tipo==='punto'){
       grupos.punto.addLayer(L.circleMarker([g.coordinates[1],g.coordinates[0]],Object.assign({},EST.punto,MARC))
         .bindPopup(popupHTML(p), POPUP_OPTS)); contadores.punto++;
-    }else if(p.tipo==='regional'){
-      if(g.type==='Polygon'||g.type==='MultiPolygon'){
-        const ll=geojsonToLatLngs(g);
-        if(ll) grupos.reg.addLayer(L.polygon(ll,Object.assign({},EST.regPoly,POLY)).bindPopup(popupHTML(p), POPUP_OPTS));
-      }
-      const c=geometriaCentro(g);
-      grupos.reg.addLayer(L.circleMarker(c,Object.assign({},EST.regSym,MARC)).bindPopup(popupHTML(p), POPUP_OPTS));
+}else if(p.tipo==='regional'){
+      const c = g.type==='Point' ? [g.coordinates[1],g.coordinates[0]] : geometriaCentro(g);
+      if(c){grupos.reg.addLayer(L.circleMarker(c,Object.assign({},EST.reg,MARC)).bindPopup(popupHTML(p), POPUP_OPTS));}
       contadores.reg++;
-}else{
+    }else{
       const anc = NAC_ANCHOR[p.lugar] || (g.type==='Point' ? [g.coordinates[1],g.coordinates[0]] : geometriaCentro(g));
       if(anc){grupos.nac.addLayer(L.circleMarker(anc,Object.assign({},EST.nac,MARC)).bindPopup(popupHTML(p), POPUP_OPTS));contadores.nac++;}
     }
