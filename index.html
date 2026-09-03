@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<meta name="theme-color" content="#1a5276"/>
+<title>Visor Andean Geology — Artículos georreferenciados</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<style>
+  html,body{margin:0;height:100%;font-family:'Segoe UI',Arial,sans-serif;-webkit-text-size-adjust:100%}
+  #app{display:flex;flex-direction:column;height:100vh;height:100dvh}
+  #map{flex:1;min-height:0}
+  #panel{flex:none;display:flex;flex-direction:column;background:#f4f7fa;
+         border-top:2px solid #1a5276;box-shadow:0 -3px 10px rgba(0,0,0,.13);
+         max-height:48vh;max-height:48dvh;z-index:1100}
+  #phead{flex:none;display:flex;align-items:center;gap:10px;padding:8px 12px;
+         background:#fff;border-bottom:1px solid #dbe4ec;cursor:pointer;user-select:none;min-height:48px}
+  #phead:hover{background:#f7fafc}
+  #plogo{width:auto;height:34px;object-fit:contain;border-radius:6px;flex:none;background:#fff;
+         border:1px solid #d5dee7;padding:2px 6px}
+  #phead h1{font-size:14px;color:#1a5276;margin:0;line-height:1.2;font-weight:700}
+  #ptoggle{margin-left:auto;flex:none;min-width:52px;height:36px;line-height:1;cursor:pointer;
+           border:1px solid #b7c6d4;background:#eef4f9;border-radius:8px;color:#1a5276;
+           font-size:19px;font-weight:700;padding:0;display:flex;align-items:center;justify-content:center}
+  #ptoggle:hover{background:#dbe8f3}
+  #pbody{overflow-y:auto;-webkit-overflow-scrolling:touch;padding:10px 12px 14px;
+         padding-bottom:calc(14px + env(safe-area-inset-bottom))}
+  #panel.collapsed #pbody{display:none}
+  .bloque{background:#fff;border:1px solid #e2e8f0;border-radius:8px;margin-bottom:8px;padding:9px 10px}
+  .bloque h2{font-size:13px;color:#1a5276;margin:0 0 8px;font-weight:700}
+  #busq{width:100%;font-size:15px;padding:8px;border-radius:8px;border:1px solid #cbd5e1;box-sizing:border-box}
+  #decada{width:100%;font-size:14px;padding:7px;border-radius:8px;border:1px solid #cbd5e1;margin-top:8px}
+  .capa{display:flex;align-items:center;gap:9px;padding:6px 2px;font-size:14px;cursor:pointer;line-height:1.3}
+  .capa input{width:19px;height:19px;flex:none;accent-color:#1a5276;margin:0}
+  .capa .n{color:#64748b;font-size:12px}
+  .sw{width:14px;height:14px;border-radius:50%;flex:none;border:1px solid rgba(0,0,0,.25)}
+  .sw.punto{background:#f5c518}.sw.reg{background:#e53935}.sw.nac{background:#4285f4}
+  .count{color:#1a5276;font-weight:700}
+  #leybtn{width:100%;margin-top:8px;font-size:13px;border:1px solid #cbd5e1;background:#fff;
+          border-radius:8px;padding:7px 11px;cursor:pointer}
+  @media (min-width:900px){ #panel{max-height:42vh} #pbody{display:grid;grid-template-columns:1fr 1fr;gap:8px} }
+  @media (max-width:640px){ #panel{max-height:55vh;max-height:55dvh} #phead h1{font-size:13px} }
+  .leaflet-popup-content{font-size:13px;line-height:1.45;max-width:320px}
+  .leaflet-popup-content b.t{font-size:13.5px}
+  .leaflet-popup-content .aut{color:#475569}
+  .leaflet-popup-content .met{color:#64748b;font-size:11.5px;margin:4px 0}
+  .leaflet-popup-content .abs{color:#334155;font-size:12px;margin:6px 0}
+  .btn{display:inline-block;margin:2px 4px 0 0;font-size:12px;border:1px solid #cbd5e1;background:#fff;
+       border-radius:8px;padding:6px 10px;text-decoration:none;color:#1e293b}
+  .btn.pdf{border:1px solid #e0a878;background:#fff5ec;color:#a2531a}
+  #legmodal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:2000}
+  #legmodal.open{display:flex}
+  #legwrap{background:#fff;border-radius:8px;max-width:92vw;max-height:92vh;overflow:auto;padding:18px 22px;position:relative;max-width:420px}
+  #legclose{position:absolute;top:8px;right:10px;z-index:5;background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:6px 12px;cursor:pointer}
+  #legwrap h3{margin:0 0 10px;color:#1a5276}
+  #legwrap .fila{display:flex;align-items:center;gap:10px;margin:6px 0;font-size:13px}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="map"></div>
+  <div id="panel">
+    <div id="phead" role="button" tabindex="0" aria-expanded="true" aria-controls="pbody" title="Mostrar u ocultar el panel">
+      <img id="plogo" src="assets/banner_andeangeology.jpg" alt="Andean Geology"/>
+      <h1>Visor Andean Geology · Artículos georreferenciados (1974–2027)</h1>
+      <button id="ptoggle" aria-label="Ocultar panel" title="Ocultar panel">&#9660;</button>
+    </div>
+    <div id="pbody">
+      <div class="bloque">
+        <h2>🔎 Buscar</h2>
+        <input id="busq" type="search" placeholder="Título o autor…" aria-label="Buscar por título o autor"/>
+        <select id="decada" aria-label="Filtrar por década">
+          <option value="">Todas las décadas</option>
+          <option value="197">1970s</option>
+          <option value="198">1980s</option>
+          <option value="199">1990s</option>
+          <option value="200">2000s</option>
+          <option value="201">2010s</option>
+          <option value="202">2020s</option>
+        </select>
+      </div>
+      <div class="bloque">
+        <h2>🗺️ Capas</h2>
+        <label class="capa"><input type="checkbox" id="chk-punto" checked/><span class="sw punto"></span>
+          Puntos <span class="n">(estudios puntuales)</span> <span class="count" id="n-punto"></span></label>
+        <label class="capa"><input type="checkbox" id="chk-reg"/><span class="sw reg"></span>
+          Regionales <span class="n">(polígono + símbolo)</span> <span class="count" id="n-reg"></span></label>
+        <label class="capa"><input type="checkbox" id="chk-nac"/><span class="sw nac"></span>
+          Nacionales <span class="n">(país completo)</span> <span class="count" id="n-nac"></span></label>
+        <button id="leybtn">ⓘ Leyenda y fuentes</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="legmodal"><div id="legwrap"><button id="legclose">✕ Cerrar</button>
+  <h3>Leyenda — Visor Andean Geology</h3>
+  <div class="fila"><span class="sw punto"></span> Punto: estudio local (mina, volcán, afloramiento, sección)</div>
+  <div class="fila"><span class="sw reg"></span> Regional: área de estudio (polígono naranjo) + símbolo rojo central</div>
+  <div class="fila"><span class="sw nac"></span> Nacional: revisión de país completo (polígono azul)</div>
+  <p style="font-size:12px;color:#475569;margin-top:10px">922 artículos de <b>Andean Geology</b> (Revista Geológica de Chile, 1974–2027)
+  georreferenciados desde sus abstracts (coordenadas explícitas o gazetteer). Cada popup trae el abstract y el enlace
+  de descarga del PDF (revista de acceso abierto CC-BY). CRS WGS84.</p>
+</div></div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+/* ---------- bases ---------- */
+const map = L.map('map',{center:[-35.0,-70.5],zoom:5});
+const bases = {
+  "Satelital": L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Esri'}),
+  "Topográfico": L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Esri'}),
+  "OpenTopoMap": L.tileLayer('https://a.tile.opentopomap.org/{z}/{x}/{y}.png',{maxZoom:17,attribution:'OpenTopoMap'})
+};
+bases["Satelital"].addTo(map);
+L.control.layers(bases,null,{position:'topright'}).addTo(map);
+map.createPane('pane_art').style.zIndex = 400;
+
+/* ---------- estilos por tipo ---------- */
+const EST = {
+  punto: {radius:5,color:'#b8860b',weight:1.5,fillColor:'#f5c518',fillOpacity:.9},
+  regSym: {radius:5,color:'#b71c1c',weight:1.5,fillColor:'#e53935',fillOpacity:.9},
+  regPoly: {color:'#ff8c00',weight:2,fillColor:'#ff8c00',fillOpacity:.22},
+  nacPoly: {color:'#4285f4',weight:1.5,fillColor:'#4285f4',fillOpacity:.12}
+};
+
+/* ---------- popup ---------- */
+function esc(t){const d=document.createElement('div');d.textContent=t||'';return d.innerHTML;}
+function popupHTML(p){
+  let h = '<b class="t">'+esc(p.titulo)+'</b><br/><span class="aut">'+esc(p.autores)+'</span>'+
+    '<div class="met">Andean Geology · '+esc(p.anio)+(p.numero?' · '+esc(p.numero):'')+
+    (p.paginas?' · págs. '+esc(p.paginas):'')+'</div>';
+  if(p.doi) h += '<div class="met">DOI: '+esc(p.doi)+'</div>';
+  if(p.lugar) h += '<div class="met">Lugar: '+esc(p.lugar)+'</div>';
+  if(p.abstract){
+    const ab = p.abstract.length>380 ? p.abstract.slice(0,377).replace(/\s+\S*$/,'')+'…' : p.abstract;
+    h += '<div class="abs">'+esc(ab)+'</div>';
+  }
+  h += '<a class="btn" target="_blank" rel="noopener noreferrer" href="'+esc(p.revista_url)+'">Ver en revista</a>'+
+       (p.pdf_url?'<a class="btn pdf" target="_blank" rel="noopener noreferrer" href="'+esc(p.pdf_url)+'">⬇ Descargar PDF</a>':'');
+  return h;
+}
+function geometriaCentro(geom){
+  if(geom.type==='Point') return [geom.coordinates[1],geom.coordinates[0]];
+  const ring = geom.type==='Polygon' ? geom.coordinates[0] : geom.coordinates[0][0];
+  const lats=ring.map(c=>c[1]), lons=ring.map(c=>c[0]);
+  return [(Math.min(...lats)+Math.max(...lats))/2,(Math.min(...lons)+Math.max(...lons))/2];
+}
+
+/* ---------- datos y capas ---------- */
+let DATOS=null;
+const grupos={punto:L.layerGroup([],{pane:'pane_art'}),reg:L.layerGroup([],{pane:'pane_art'}),
+             nac:L.layerGroup([],{pane:'pane_art'})};
+const contadores={punto:0,reg:0,nac:0};
+
+function filtroActivo(){
+  const q=(document.getElementById('busq').value||'').trim().toLowerCase();
+  const dec=document.getElementById('decada').value;
+  return {q,dec};
+}
+function aplicarFiltros(){
+  const {q,dec}=filtroActivo();
+  grupos.punto.clearLayers();grupos.reg.clearLayers();grupos.nac.clearLayers();
+  contadores.punto=0;contadores.reg=0;contadores.nac=0;
+  DATOS.features.forEach(f=>{
+    const p=f.properties;
+    if(q && !((p.titulo||'').toLowerCase().includes(q)||(p.autores||'').toLowerCase().includes(q))) return;
+    if(dec && !String(p.anio).startsWith(dec)) return;
+    const g=f.geometry;
+    if(p.tipo==='punto'){
+      grupos.punto.addLayer(L.circleMarker([g.coordinates[1],g.coordinates[0]],EST.punto)
+        .bindPopup(popupHTML(p))); contadores.punto++;
+    }else if(p.tipo==='regional'){
+      if(g.type==='Polygon'||g.type==='MultiPolygon'){grupos.reg.addLayer(L.polygon(g.coordinates,EST.regPoly).bindPopup(popupHTML(p)));}
+      const c=geometriaCentro(g);
+      grupos.reg.addLayer(L.circleMarker(c,EST.regSym).bindPopup(popupHTML(p)));
+      contadores.reg++;
+    }else{
+      if(g.type==='Polygon'||g.type==='MultiPolygon'){grupos.nac.addLayer(L.polygon(g.coordinates,EST.nacPoly).bindPopup(popupHTML(p)));contadores.nac++;}
+      else{grupos.nac.addLayer(L.circleMarker([g.coordinates[1],g.coordinates[0]],EST.nacPoly).bindPopup(popupHTML(p)));contadores.nac++;}
+    }
+  });
+  document.getElementById('n-punto').textContent='('+contadores.punto+')';
+  document.getElementById('n-reg').textContent='('+contadores.reg+')';
+  document.getElementById('n-nac').textContent='('+contadores.nac+')';
+}
+
+/* visibilidad segun checkboxes */
+function sincronizar(){
+  const cp=document.getElementById('chk-punto'),cr=document.getElementById('chk-reg'),cn=document.getElementById('chk-nac');
+  if(cp.checked) grupos.punto.addTo(map); else grupos.punto.remove();
+  if(cr.checked) grupos.reg.addTo(map); else grupos.reg.remove();
+  if(cn.checked) grupos.nac.addTo(map); else grupos.nac.remove();
+}
+['chk-punto','chk-reg','chk-nac'].forEach(id=>document.getElementById(id).addEventListener('change',sincronizar));
+
+let deb=null;
+['busq','decada'].forEach(id=>document.getElementById(id).addEventListener('input',()=>{
+  clearTimeout(deb); deb=setTimeout(aplicarFiltros,180);
+}));
+
+fetch('articulos.geojson',{cache:'no-cache'}).then(r=>r.json()).then(d=>{
+  DATOS=d; aplicarFiltros(); sincronizar(); map.invalidateSize();
+}).catch(e=>console.error('No se pudo cargar articulos.geojson:',e));
+
+/* ---------- panel plegable (igual patrón GeoChile) ---------- */
+const panel=document.getElementById('panel'),phead=document.getElementById('phead'),pt=document.getElementById('ptoggle');
+function togglePanel(){
+  const col=panel.classList.toggle('collapsed');
+  pt.innerHTML=col?'&#9650;':'&#9660;';
+  pt.title=pt.ariaLabel=col?'Mostrar panel':'Ocultar panel';
+  phead.setAttribute('aria-expanded',String(!col));
+  setTimeout(()=>map.invalidateSize(),220);
+}
+phead.addEventListener('click',togglePanel);
+phead.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();togglePanel();}});
+pt.addEventListener('click',e=>e.stopPropagation());
+pt.addEventListener('click',togglePanel);
+if(window.matchMedia('(max-width:640px)').matches) togglePanel();
+
+let rzT=null;
+const remedir=()=>{clearTimeout(rzT);rzT=setTimeout(()=>map.invalidateSize(),150);};
+window.addEventListener('resize',remedir);
+window.addEventListener('orientationchange',()=>setTimeout(()=>map.invalidateSize(),300));
+if(window.ResizeObserver) new ResizeObserver(remedir).observe(document.getElementById('map'));
+
+/* ---------- modal leyenda ---------- */
+const lm=document.getElementById('legmodal');
+document.getElementById('leybtn').addEventListener('click',()=>lm.classList.add('open'));
+document.getElementById('legclose').addEventListener('click',()=>lm.classList.remove('open'));
+lm.addEventListener('click',e=>{if(e.target===lm) lm.classList.remove('open');});
+</script>
+</body>
+</html>
