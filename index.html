@@ -69,14 +69,8 @@
       <div class="bloque">
         <h2>🔎 Buscar</h2>
         <input id="busq" type="search" placeholder="Título o autor…" aria-label="Buscar por título o autor"/>
-        <select id="decada" aria-label="Filtrar por década">
+        <select id="decada" aria-label="Filtrar por década o año">
           <option value="">Todas las décadas</option>
-          <option value="197">1970s</option>
-          <option value="198">1980s</option>
-          <option value="199">1990s</option>
-          <option value="200">2000s</option>
-          <option value="201">2010s</option>
-          <option value="202">2020s</option>
         </select>
       </div>
       <div class="bloque">
@@ -144,6 +138,12 @@ function geometriaCentro(geom){
   const lats=ring.map(c=>c[1]), lons=ring.map(c=>c[0]);
   return [(Math.min(...lats)+Math.max(...lats))/2,(Math.min(...lons)+Math.max(...lons))/2];
 }
+/* GeoJSON [lon,lat] -> Leaflet [lat,lng], Polygon y MultiPolygon */
+function geojsonToLatLngs(geom){
+  if(geom.type==='Polygon') return geom.coordinates.map(ring=>ring.map(c=>[c[1],c[0]]));
+  if(geom.type==='MultiPolygon') return geom.coordinates.map(poly=>poly.map(ring=>ring.map(c=>[c[1],c[0]])));
+  return null;
+}
 
 /* ---------- datos y capas ---------- */
 let DATOS=null;
@@ -169,13 +169,21 @@ function aplicarFiltros(){
       grupos.punto.addLayer(L.circleMarker([g.coordinates[1],g.coordinates[0]],EST.punto)
         .bindPopup(popupHTML(p))); contadores.punto++;
     }else if(p.tipo==='regional'){
-      if(g.type==='Polygon'||g.type==='MultiPolygon'){grupos.reg.addLayer(L.polygon(g.coordinates,EST.regPoly).bindPopup(popupHTML(p)));}
+      if(g.type==='Polygon'||g.type==='MultiPolygon'){
+        const ll=geojsonToLatLngs(g);
+        if(ll) grupos.reg.addLayer(L.polygon(ll,EST.regPoly).bindPopup(popupHTML(p)));
+      }
       const c=geometriaCentro(g);
       grupos.reg.addLayer(L.circleMarker(c,EST.regSym).bindPopup(popupHTML(p)));
       contadores.reg++;
     }else{
-      if(g.type==='Polygon'||g.type==='MultiPolygon'){grupos.nac.addLayer(L.polygon(g.coordinates,EST.nacPoly).bindPopup(popupHTML(p)));contadores.nac++;}
-      else{grupos.nac.addLayer(L.circleMarker([g.coordinates[1],g.coordinates[0]],EST.nacPoly).bindPopup(popupHTML(p)));contadores.nac++;}
+      if(g.type==='Polygon'||g.type==='MultiPolygon'){
+        const ll=geojsonToLatLngs(g);
+        if(ll){grupos.nac.addLayer(L.polygon(ll,EST.nacPoly).bindPopup(popupHTML(p)));contadores.nac++;}
+      }else{
+        grupos.nac.addLayer(L.circleMarker([g.coordinates[1],g.coordinates[0]],EST.nacPoly).bindPopup(popupHTML(p)));
+        contadores.nac++;
+      }
     }
   });
   document.getElementById('n-punto').textContent='('+contadores.punto+')';
@@ -198,7 +206,17 @@ let deb=null;
 }));
 
 fetch('articulos.geojson',{cache:'no-cache'}).then(r=>r.json()).then(d=>{
-  DATOS=d; aplicarFiltros(); sincronizar(); map.invalidateSize();
+  DATOS=d;
+  const decSel=document.getElementById('decada');
+  const anios=[...new Set(d.features.map(f=>f.properties.anio).filter(a=>/^\d{4}$/.test(String(a))))].sort();
+  const decs={};
+  anios.forEach(a=>{(decs[Math.floor(a/10)*10]=decs[Math.floor(a/10)*10]||[]).push(a);});
+  Object.keys(decs).sort().forEach(dec=>{
+    const og=document.createElement('optgroup'); og.label=dec+'s';
+    decs[dec].forEach(a=>{const o=document.createElement('option');o.value=String(a);o.textContent=a;og.appendChild(o);});
+    decSel.appendChild(og);
+  });
+  aplicarFiltros(); sincronizar(); map.invalidateSize();
 }).catch(e=>console.error('No se pudo cargar articulos.geojson:',e));
 
 /* ---------- panel plegable (igual patrón GeoChile) ---------- */
