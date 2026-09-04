@@ -10,6 +10,10 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"/>
 <style>
   html,body{margin:0;height:100%;font-family:'Segoe UI',Arial,sans-serif;-webkit-text-size-adjust:100%}
+  input,select,button{touch-action:manipulation}
+  input,select{font-size:16px}
+  html,body{overscroll-behavior:none}
+  #pbody{overscroll-behavior-y:contain}
   #app{display:flex;flex-direction:column;height:100vh;height:100dvh}
   #map{flex:1;min-height:0}
   #panel{flex:none;display:flex;flex-direction:column;background:#f4f7fa;
@@ -40,8 +44,26 @@
   .count{color:#1a5276;font-weight:700}
   #leybtn{width:100%;margin-top:8px;font-size:13px;border:1px solid #cbd5e1;background:#fff;
           border-radius:8px;padding:7px 11px;cursor:pointer}
+  @media (min-width:641px) and (max-width:900px){ #panel{max-height:50dvh} }
   @media (min-width:900px){ #panel{max-height:42vh} #pbody{display:grid;grid-template-columns:1fr 1fr;gap:8px} }
-  @media (max-width:640px){ #panel{max-height:55vh;max-height:55dvh} #phead h1{font-size:13px} }
+  @media (max-width:640px){
+    #panel{max-height:62dvh}
+    #phead h1{font-size:13px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    #ptoggle{height:44px;min-width:44px}
+    #plogo{height:26px}
+    .leaflet-popup-content{min-width:0;max-width:calc(100vw - 20px);max-height:60vh}
+    .capa{font-size:15px;padding:9px 2px}
+    .capa input{width:22px;height:22px}
+    .btn{padding:9px 12px;font-size:13px}
+    .lm{font-size:12.5px;padding:6px 12px}
+    #busq{font-size:16px}
+    #decada{font-size:16px}
+    .bloque{padding:10px 12px}
+    #leybtn{font-size:14px;padding:10px}
+    .leaflet-control-layers,.leaflet-control-layers label{font-size:15px}
+    .leaflet-control-layers input[type=checkbox]{width:22px;height:22px}
+  }
+  @media (max-width:640px) and (max-height:480px){ #panel{max-height:38dvh} }
   .leaflet-popup-content{font-size:13.5px;line-height:1.5;max-width:720px;min-width:340px;max-height:340px;overflow-y:auto}
   .leaflet-popup-content b.t{font-size:14px}
   .leaflet-popup-content .aut{color:#475569}
