@@ -1,6 +1,6 @@
 # Visor Andean Geology — Artículos georreferenciados
 
-Visor web (Leaflet) de los **921 artículos de Andean Geology (Revista Geológica de Chile, 1974–2027)**
+Visor web (Leaflet) de los **922 artículos de Andean Geology (Revista Geológica de Chile, 1974–2027)**
 georreferenciados a partir de sus abstracts. Cada popup muestra el abstract y enlaces a la revista y al PDF
 (revista de acceso abierto CC-BY).
 
@@ -12,7 +12,7 @@ Se distinguen por `properties.tipo`, y las tres se dibujan como **marcadores cir
 y nacionales, agrupados en clusters):
 
 - **Puntos** (405) — estudios puntuales (minas, volcanes, afloramientos, secciones). Círculo amarillo.
-- **Regionales** (461) — área de estudio. Círculo rojo en el centro del área.
+- **Regionales** (462) — área de estudio. Círculo rojo en el centro del área.
 - **Nacionales** (55) — revisiones de país completo. Círculo azul, anclado en la capital del país.
 
 Filtros por **búsqueda** (título/autor) y **década/año**.
@@ -24,7 +24,7 @@ Filtros por **búsqueda** (título/autor) y **década/año**.
 ## Estructura
 
 - `index.html` — visor Leaflet (lee `articulos.geojson` en vivo).
-- `articulos.geojson` — FeatureCollection WGS84 de los 921 artículos. Propiedades: `id`, `titulo`,
+- `articulos.geojson` — FeatureCollection WGS84 de los 922 artículos. Propiedades: `id`, `titulo`,
   `autores`, `anio`, `numero`, `paginas`, `doi`, `lugar`, `tipo`, `confianza`, `keywords`, `abstract`,
   `pdf_url`, `revista_url`.
 - `assets/banner_andeangeology.jpg` — banner oficial de la revista.
@@ -44,7 +44,7 @@ revisión manual integrada, KMZ paralelo (`Andean_Geology.geo.kmz`). Detalle en 
 RAG-Bibliografia.
 
 El campo `confianza` refleja qué tan directa fue esa extracción: **225 artículos en `alta`** (coordenadas
-explícitas en el texto) y **696 en `media`** (resueltos por gazetteer). Conviene mostrarlo aguas abajo: una
+explícitas en el texto) y **697 en `media`** (resueltos por gazetteer). Conviene mostrarlo aguas abajo: una
 ubicación de confianza media es aproximada y no debería tomarse como dato duro sin revisar el artículo.
 
 ## Quién consume este archivo
