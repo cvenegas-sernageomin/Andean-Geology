@@ -76,7 +76,14 @@ for aid, r in ubic.items():
     features.append({"type": "Feature", "properties": props, "geometry": geom})
     stats[tipo] += 1
 
-fc = {"type": "FeatureCollection", "features": features}
+CITA = ("Venegas Benavides, C. (2026). Georreferenciación de los artículos de Andean Geology "
+        "(1974–2027) [conjunto de datos]. https://cvenegas-sernageomin.github.io/Andean-Geology/")
+fc = {
+    "type": "FeatureCollection",
+    "license": "CC BY-NC 4.0 (georreferenciación) — https://creativecommons.org/licenses/by-nc/4.0/",
+    "cite_as": CITA,
+    "features": features,
+}
 with open(OUT, "w", encoding="utf-8") as f:
     json.dump(fc, f, ensure_ascii=False)
 

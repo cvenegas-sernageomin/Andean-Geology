@@ -58,3 +58,19 @@ consumidores, sin que haya que republicarlos:
   "📚 Artículos" de la vista mapa. Guardan una copia para uso sin señal y revisan si hay versión nueva
   comparando el `Last-Modified` del archivo, así que el cambio entra la próxima vez que se enciende la capa
   con conexión.
+
+## Licencia y cómo citar
+
+La **georreferenciación** (geometrías y campos `lugar`, `tipo`, `confianza` de `articulos.geojson`, el KMZ
+derivado) y el visor se distribuyen bajo **[CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/deed.es)**:
+se pueden usar y adaptar **citando la fuente** y **sin fines comerciales**. Ver [`LICENSE`](LICENSE).
+
+Los metadatos bibliográficos y abstracts pertenecen a sus autores y a la revista Andean Geology (CC BY).
+
+Cita sugerida:
+
+> Venegas Benavides, C. (2026). *Georreferenciación de los artículos de Andean Geology (1974–2027)*
+> [conjunto de datos]. https://cvenegas-sernageomin.github.io/Andean-Geology/
+
+El GeoJSON lleva la licencia y la cita en sus campos `license` y `cite_as`, para que viajen con el archivo.
+

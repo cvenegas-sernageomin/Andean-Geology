@@ -121,13 +121,22 @@
   <p style="font-size:12px;color:#475569;margin-top:10px">922 artículos de <b>Andean Geology</b> (Revista Geológica de Chile, 1974–2027)
   georreferenciados desde sus abstracts (coordenadas explícitas o gazetteer). Cada popup trae el abstract y el enlace
   de descarga del PDF (revista de acceso abierto CC-BY). CRS WGS84. Cuando varios trabajos regionales o
-  nacionales coinciden, se agrupan en un marcador con número: haz clic en zoom máximo para desplegarlos en abanico.
+  nacionales coinciden, se agrupan en un marcador con número: haz clic en zoom máximo para desplegarlos en abanico.</p>
+  <h3 style="margin-top:14px">Licencia y cita</h3>
+  <p style="font-size:12px;color:#475569">La georreferenciación de estos artículos es obra de Carlos Venegas Benavides y se
+  distribuye bajo licencia <a href="https://creativecommons.org/licenses/by-nc/4.0/deed.es" target="_blank" rel="noopener">CC BY-NC 4.0</a>:
+  puede usarse y adaptarse <b>citando la fuente</b> y <b>sin fines comerciales</b>. Los abstracts y datos bibliográficos
+  pertenecen a sus autores y a Andean Geology.</p>
+  <p style="font-size:12px;background:#f1f5f9;border-left:3px solid #64748b;padding:6px 8px;margin-top:6px">
+  Venegas Benavides, C. (2026). <i>Georreferenciación de los artículos de Andean Geology (1974–2027)</i>
+  [conjunto de datos]. https://cvenegas-sernageomin.github.io/Andean-Geology/</p>
 </div></div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 <script>
 /* ---------- bases ---------- */
 const map = L.map('map',{center:[-35.0,-70.5],zoom:5});
+map.attributionControl.addAttribution('Georref. © C. Venegas Benavides · <a href="https://creativecommons.org/licenses/by-nc/4.0/deed.es" target="_blank" rel="noopener">CC BY-NC 4.0</a>');
 const bases = {
   "Satelital": L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Esri'}),
   "Topográfico": L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Esri'}),
