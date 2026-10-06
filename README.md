@@ -61,16 +61,14 @@ consumidores, sin que haya que republicarlos:
 
 ## Licencia y cómo citar
 
-La **georreferenciación** (geometrías y campos `lugar`, `tipo`, `confianza` de `articulos.geojson`, el KMZ
-derivado) y el visor se distribuyen bajo **[CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/deed.es)**:
-se pueden usar y adaptar **citando la fuente** y **sin fines comerciales**. Ver [`LICENSE`](LICENSE).
+© 2026 SERNAGEOMIN / Carlos Venegas Benavides. El trabajo original de este repositorio se distribuye bajo
+**[CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/deed.es)**: se puede compartir y adaptar
+**citando la fuente** y **sin fines comerciales**. Ver [`LICENSE`](LICENSE).
 
-Los metadatos bibliográficos y abstracts pertenecen a sus autores y a la revista Andean Geology (CC BY).
+Los metadatos bibliográficos y abstracts de los artículos (título, autores, año, número, DOI, abstract, keywords, enlaces) pertenecen a sus autores y a la revista Andean Geology, publicada en acceso abierto bajo CC BY. Las librerías de terceros incluidas (por ejemplo en `vendor/`) conservan sus propias licencias.
 
 Cita sugerida:
 
-> Venegas Benavides, C. (2026). *Georreferenciación de los artículos de Andean Geology (1974–2027)*
-> [conjunto de datos]. https://cvenegas-sernageomin.github.io/Andean-Geology/
+> SERNAGEOMIN / Venegas Benavides, C. (2026). Georreferenciación de los artículos de Andean Geology (1974–2027) [conjunto de datos]. https://cvenegas-sernageomin.github.io/Andean-Geology/
 
 El GeoJSON lleva la licencia y la cita en sus campos `license` y `cite_as`, para que viajen con el archivo.
-

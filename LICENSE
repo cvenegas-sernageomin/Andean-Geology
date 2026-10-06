@@ -1,16 +1,15 @@
 Creative Commons Atribución-NoComercial 4.0 Internacional (CC BY-NC 4.0)
 https://creativecommons.org/licenses/by-nc/4.0/deed.es
 
-Copyright (c) 2026 Carlos Venegas Benavides
+Copyright (c) 2026 SERNAGEOMIN / Carlos Venegas Benavides
 
 ALCANCE
-Esta licencia cubre la georreferenciación de los artículos: las geometrías y los campos
-`lugar`, `tipo` y `confianza` de `articulos.geojson`, el KMZ derivado, y el visor
-(index.html y herramientas de este repositorio).
+Esta licencia cubre el trabajo original de este repositorio: código, diseño, datos y
+contenidos elaborados por los autores.
 
-NO cubre los metadatos bibliográficos ni los abstracts de los artículos (título, autores,
-año, número, DOI, abstract, keywords, enlaces), que pertenecen a sus autores y a la revista
-Andean Geology (SERNAGEOMIN), publicada en acceso abierto bajo CC BY.
+NO cubre el material de terceros, que conserva sus propios derechos y licencias:
+- Los metadatos bibliográficos y abstracts de los artículos (título, autores, año, número, DOI, abstract, keywords, enlaces) pertenecen a sus autores y a la revista Andean Geology, publicada en acceso abierto bajo CC BY.
+- Las librerías de terceros incluidas (por ejemplo en `vendor/`) conservan sus propias licencias.
 
 USTED PUEDE
 - Compartir: copiar y redistribuir el material en cualquier medio o formato.
@@ -22,8 +21,7 @@ BAJO LAS SIGUIENTES CONDICIONES
 - NoComercial: no puede usar el material con fines comerciales.
 
 CÓMO CITAR
-Venegas Benavides, C. (2026). Georreferenciación de los artículos de Andean Geology
-(1974–2027) [conjunto de datos]. https://cvenegas-sernageomin.github.io/Andean-Geology/
+SERNAGEOMIN / Venegas Benavides, C. (2026). Georreferenciación de los artículos de Andean Geology (1974–2027) [conjunto de datos]. https://cvenegas-sernageomin.github.io/Andean-Geology/
 
 El texto legal completo de la licencia está en:
 https://creativecommons.org/licenses/by-nc/4.0/legalcode.es

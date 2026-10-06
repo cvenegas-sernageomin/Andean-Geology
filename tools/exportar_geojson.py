@@ -76,7 +76,7 @@ for aid, r in ubic.items():
     features.append({"type": "Feature", "properties": props, "geometry": geom})
     stats[tipo] += 1
 
-CITA = ("Venegas Benavides, C. (2026). Georreferenciación de los artículos de Andean Geology "
+CITA = ("SERNAGEOMIN / Venegas Benavides, C. (2026). Georreferenciación de los artículos de Andean Geology "
         "(1974–2027) [conjunto de datos]. https://cvenegas-sernageomin.github.io/Andean-Geology/")
 fc = {
     "type": "FeatureCollection",

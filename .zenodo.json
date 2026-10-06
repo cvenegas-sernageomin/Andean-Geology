@@ -1,0 +1,31 @@
+{
+  "upload_type": "dataset",
+  "title": "Georreferenciación de los artículos de Andean Geology (1974–2027)",
+  "description": "<p>Georreferenciación de los 922 artículos de la revista Andean Geology (Revista Geológica de Chile, 1974–2027) a partir de sus abstracts, con visor web Leaflet.</p><p>Publicado en https://cvenegas-sernageomin.github.io/Andean-Geology/</p><p>La licencia CC BY-NC 4.0 cubre el trabajo original de los autores. No cubre el material de terceros:</p><ul><li>Los metadatos bibliográficos y abstracts de los artículos (título, autores, año, número, DOI, abstract, keywords, enlaces) pertenecen a sus autores y a la revista Andean Geology, publicada en acceso abierto bajo CC BY.</li><li>Las librerías de terceros incluidas (por ejemplo en vendor/) conservan sus propias licencias.</li></ul>",
+  "creators": [
+    {
+      "name": "Servicio Nacional de Geología y Minería (SERNAGEOMIN)"
+    },
+    {
+      "name": "Venegas Benavides, Carlos",
+      "affiliation": "Servicio Nacional de Geología y Minería (SERNAGEOMIN)"
+    }
+  ],
+  "license": "cc-by-nc-4.0",
+  "access_right": "open",
+  "language": "spa",
+  "keywords": [
+    "Andean Geology",
+    "georreferenciación",
+    "bibliografía geológica",
+    "Chile",
+    "SERNAGEOMIN"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://cvenegas-sernageomin.github.io/Andean-Geology/",
+      "relation": "isDocumentedBy",
+      "resource_type": "other"
+    }
+  ]
+}
