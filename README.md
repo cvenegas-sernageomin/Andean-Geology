@@ -1,5 +1,7 @@
 # Visor Andean Geology — Artículos georreferenciados
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23196772.svg)](https://doi.org/10.5281/zenodo.23196772)
+
 Visor web (Leaflet) de los **922 artículos de Andean Geology (Revista Geológica de Chile, 1974–2027)**
 georreferenciados a partir de sus abstracts. Cada popup muestra el abstract y enlaces a la revista y al PDF
 (revista de acceso abierto CC-BY).
@@ -69,6 +71,6 @@ Los metadatos bibliográficos y abstracts de los artículos (título, autores, a
 
 Cita sugerida:
 
-> SERNAGEOMIN / Venegas Benavides, C. (2026). Georreferenciación de los artículos de Andean Geology (1974–2027) [conjunto de datos]. https://cvenegas-sernageomin.github.io/Andean-Geology/
+> SERNAGEOMIN / Venegas Benavides, C. (2026). Georreferenciación de los artículos de Andean Geology (1974–2027) [conjunto de datos]. https://cvenegas-sernageomin.github.io/Andean-Geology/ · DOI: https://doi.org/10.5281/zenodo.23196772
 
 El GeoJSON lleva la licencia y la cita en sus campos `license` y `cite_as`, para que viajen con el archivo.
