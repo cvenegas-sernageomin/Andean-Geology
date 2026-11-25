@@ -56,7 +56,10 @@ function popupHTML(p){
   if (p.tema2 && TEMAS[p.tema2]) h += '<div class="tema2">también: '+esc(TEMAS[p.tema2].nombre)+'</div>';
   h += '<div class="met">'+(p.confianza==='alta'?'Ubicación por coordenadas del trabajo':'Ubicación por topónimo')+
        ' · '+({punto:'punto',regional:'área regional',nacional:'país completo'})[p.tipo]+'</div>';
-  if (p.doi) h += '<a class="btn" target="_blank" rel="noopener noreferrer" href="https://doi.org/'+encodeURI(p.doi)+'">Ver en la editorial (DOI) ↗</a>';
+  if (p.fuente === 'andean') {
+    if (p.url) h += '<a class="btn" target="_blank" rel="noopener noreferrer" href="'+esc(p.url)+'">Ver en Andean Geology ↗</a>';
+    if (p.pdf) h += '<a class="btn pdf" target="_blank" rel="noopener noreferrer" href="'+esc(p.pdf)+'">⬇ PDF (acceso abierto)</a>';
+  } else if (p.doi) h += '<a class="btn" target="_blank" rel="noopener noreferrer" href="https://doi.org/'+encodeURI(p.doi)+'">Ver en la editorial (DOI) ↗</a>';
   return h + '</div>';
 }
 
@@ -70,14 +73,17 @@ const cluster = L.markerClusterGroup({
 }).addTo(map);
 let bboxCapa = null;
 const activos = new Set(ORDEN);
+const fuentes = new Set(['andean', 'otras']);
+const fuenteDe = p => p.fuente === 'andean' ? 'andean' : 'otras';
 
-function filtrados(ignorarTema){
+function filtrados(ignorarTema, ignorarFuente){
   const q = (document.getElementById('busq').value || '').trim().toLowerCase();
   const dec = document.getElementById('decada').value;
   const conf = document.getElementById('conf').value;
   const tipos = {punto:chk('punto'), regional:chk('regional'), nacional:chk('nacional')};
   return DATOS.features.filter(f => {
     const p = f.properties;
+    if (!ignorarFuente && !fuentes.has(fuenteDe(p))) return false;
     if (!ignorarTema && !activos.has(p.tema)) return false;
     if (!tipos[p.tipo]) return false;
     if (conf && p.confianza !== conf) return false;
@@ -105,6 +111,9 @@ function render(){
   const porTema = {}; ORDEN.forEach(t => porTema[t] = 0);
   filtrados(true).forEach(f => porTema[f.properties.tema]++);
   ORDEN.forEach(t => { const el = document.getElementById('n-'+t); if (el) el.textContent = porTema[t]; });
+  const porFuente = {andean:0, otras:0};
+  filtrados(false, true).forEach(f => porFuente[fuenteDe(f.properties)]++);
+  Object.keys(porFuente).forEach(k => document.getElementById('n-'+k).textContent = porFuente[k].toLocaleString('es-CL'));
   const porTipo = {punto:0, regional:0, nacional:0};
   lista.forEach(f => porTipo[f.properties.tipo]++);
   Object.keys(porTipo).forEach(k => document.getElementById('n-'+k).textContent = porTipo[k]);
@@ -151,6 +160,13 @@ function fijarTemas(lista){
   render();
 }
 armarTemas();
+document.querySelector('.fuentes').addEventListener('click', e => {
+  const b = e.target.closest('.fu'); if (!b) return;
+  const on = b.getAttribute('aria-pressed') !== 'true';
+  b.setAttribute('aria-pressed', String(on));
+  on ? fuentes.add(b.dataset.fuente) : fuentes.delete(b.dataset.fuente);
+  render();
+});
 
 ['chk-punto','chk-regional','chk-nacional','decada','conf'].forEach(id => document.getElementById(id).addEventListener('change', render));
 let deb = null;

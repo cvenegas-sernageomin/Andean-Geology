@@ -51,6 +51,13 @@
   .sw.anillo{background:#fff !important;border:4px solid}
   .tam{display:inline-block;border-radius:50%;background:#94a3b8;border:2px solid #fff;box-shadow:0 0 0 1px #94a3b8;flex:none}
   .count{color:var(--azul);font-weight:700}
+  .fuentes{display:flex;gap:8px}
+  .fu{flex:1;min-width:0;border:1.5px solid #cbd5e1;background:#fff;color:var(--tinta2);border-radius:10px;
+      padding:9px 8px;cursor:pointer;font-size:14px;font-weight:600;line-height:1.25;text-align:center}
+  .fu .n{display:block;font-weight:400;font-size:12px}
+  .fu[aria-pressed=true]{border-color:var(--azul);background:#e6eff7;color:var(--azul)}
+  .fu[aria-pressed=true]::before{content:'✓ '}
+  .btn.pdf{border-color:#e0a878;background:#fff5ec;color:#a2531a}
   #total{font-size:12.5px;color:var(--tinta2);margin:2px 0 0}
   @media (min-width:900px){ #panel{max-height:44vh} #pbody{display:grid;grid-template-columns:1fr 1.4fr 1fr;gap:8px;align-items:start} #temas{grid-template-columns:1fr 1fr;column-gap:10px} }
   @media (max-width:640px){
@@ -119,6 +126,13 @@
     </div>
     <div id="pbody">
       <div class="bloque">
+        <h2>📚 Revistas</h2>
+        <div class="fuentes">
+          <button type="button" class="fu" data-fuente="andean" aria-pressed="true">Andean Geology <span class="n" id="n-andean"></span></button>
+          <button type="button" class="fu" data-fuente="otras" aria-pressed="true">Otras revistas <span class="n" id="n-otras"></span></button>
+        </div>
+      </div>
+      <div class="bloque">
         <h2>🔎 Buscar</h2>
         <input id="busq" type="search" placeholder="Título, autor, revista o lugar…" aria-label="Buscar por título, autor, revista o lugar"/>
         <div class="fila2">
@@ -166,8 +180,10 @@
   ciudades (GeoNames) y países (Natural Earth). Se descartaron las menciones de afiliaciones y de trabajos citados.
   La temática se asignó comparando el texto con descripciones de cada tema (modelo de lenguaje bge-m3, local).
   <b>Los artículos sin un área de estudio identificable no se muestran.</b> Puede haber errores de ubicación o de tema.</p>
-  <p>Los artículos pertenecen a sus autores y editoriales: este visor no reproduce resúmenes ni ofrece descargas.
-  El botón «Ver en la editorial» abre el DOI del trabajo.</p>
+  <p><b>Dos fuentes</b>, que se encienden y apagan con los botones del panel: los artículos de <b>Andean Geology</b>
+  (Revista Geológica de Chile, acceso abierto) y los de <b>otras revistas</b>. Los artículos de otras revistas pertenecen a sus
+  autores y editoriales: el visor no reproduce sus resúmenes ni ofrece descargas, y «Ver en la editorial» abre el DOI.
+  Los de Andean Geology enlazan a la página de la revista y a su PDF de acceso abierto.</p>
   <h3 style="margin-top:14px">Licencia y cita</h3>
   <p>La georreferenciación y la clasificación temática son obra de SERNAGEOMIN / Carlos Venegas Benavides y se distribuyen bajo
   <a href="https://creativecommons.org/licenses/by-nc/4.0/deed.es" target="_blank" rel="noopener">CC BY-NC 4.0</a>:
@@ -178,6 +194,8 @@
 <div class="modal" id="mayuda"><div class="mwrap"><button class="mclose" data-cierra>✕ Cerrar</button>
   <div class="tarj on"><div class="ico">🗺️</div><h3>Artículos en el mapa</h3>
     <p>Cada punto es un artículo científico ubicado en su área de estudio: un volcán, un yacimiento, una cuenca o un país.</p></div>
+  <div class="tarj"><div class="ico">📚</div><h3>Andean Geology y otras revistas</h3>
+    <p>Arriba en el panel hay un botón para cada fuente: Andean Geology y el resto de las revistas. Enciende una, la otra o ambas.</p></div>
   <div class="tarj"><div class="ico">🎨</div><h3>Color = temática</h3>
     <p>Volcanología, tectónica, geología económica y nueve temas más. En el panel puedes apagar temas o tocar «solo» para ver uno.</p></div>
   <div class="tarj"><div class="ico">🔎</div><h3>Busca y filtra</h3>

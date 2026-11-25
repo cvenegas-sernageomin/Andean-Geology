@@ -1,7 +1,9 @@
 # Bibliografía geológica georreferenciada
 
-Visor web (PWA instalable) de **2.885 artículos científicos de geología** ubicados en su área de estudio y
-coloreados según su **temática**. Los artículos provienen de la bibliografía geológica de SERNAGEOMIN.
+Visor web (PWA instalable) de **3.807 artículos científicos de geología** ubicados en su área de estudio y
+coloreados según su **temática**, en dos fuentes que se encienden con un botón cada una:
+**Andean Geology** (922, acceso abierto, del [visor Andean Geology](../)) y **otras revistas** (2.885, de la
+bibliografía geológica de SERNAGEOMIN). Las cifras de abajo son de otras revistas.
 
 ## Qué muestra
 - **Color = temática** (12 temas). Cuatro temas se dibujan como anillo (centro blanco) para distinguirlos de los
@@ -20,6 +22,7 @@ coloreados según su **temática**. Los artículos provienen de la bibliografía
   provincia; al abrirlo se dibuja su recuadro) y nacional (568: país completo).
 - Popup: título, autores, año, revista, tema · lugar y enlace **«Ver en la editorial (DOI)»** (1.773 con DOI).
   **No se reproducen resúmenes ni se ofrecen descargas**: los artículos pertenecen a sus autores y editoriales.
+  Los de Andean Geology (acceso abierto) enlazan a la página de la revista y a su PDF.
 
 ## Cómo se hizo
 - **Ubicación**: título y resumen de cada trabajo. Coordenadas explícitas (21 artículos) o un nomenclátor de
