@@ -90,6 +90,8 @@
   .mwrap h3{margin:0 0 10px;color:var(--azul);padding-right:70px}
   .mwrap p,.mwrap li{font-size:13px;color:var(--tinta2);line-height:1.5}
   .mwrap .fila{display:flex;align-items:center;gap:10px;margin:5px 0;font-size:13px}
+  .aviso{font-size:13px;background:#fff8e6;border-left:3px solid #eda100;padding:8px 10px;border-radius:4px;margin-top:14px}
+  #avisop{font-size:12px;color:var(--tinta2);margin:6px 0 0}
   .cita{font-size:12px;background:#f1f5f9;border-left:3px solid var(--muda);padding:6px 8px}
   /* presentacion */
   .tarj{display:none}.tarj.on{display:block}
@@ -143,6 +145,8 @@
           </select>
         </div>
         <p id="total"></p>
+        <p id="avisop">⚠️ La georreferenciación puede tener errores: si encuentras uno, avisa a
+          <a href="mailto:carlos.venegas@sernageomin.cl?subject=Error%20de%20georreferenciaci%C3%B3n%20-%20Bibliograf%C3%ADa%20georreferenciada">carlos.venegas@sernageomin.cl</a>.</p>
       </div>
       <div class="bloque">
         <h2>🎨 Temática <span class="acc"><button id="todos" type="button">todas</button><button id="ninguno" type="button">ninguna</button></span></h2>
@@ -174,12 +178,9 @@
   <div id="leytemas"></div>
   <p>El <b>tamaño</b> indica el tipo de área: punto chico = localidad; mediano = región (al abrirlo se dibuja su recuadro);
   grande y translúcido = país completo. Los marcadores cercanos se agrupan en un círculo azul con número.</p>
-  <h3 style="margin-top:14px">Cómo se hizo</h3>
-  <p>Artículos de la bibliografía geológica de SERNAGEOMIN. La ubicación se obtuvo del título y del resumen de cada trabajo:
-  coordenadas explícitas cuando las hay, o un nomenclátor de volcanes (Smithsonian GVP), yacimientos, regiones geológicas,
-  ciudades (GeoNames) y países (Natural Earth). Se descartaron las menciones de afiliaciones y de trabajos citados.
-  La temática se asignó comparando el texto con descripciones de cada tema (modelo de lenguaje bge-m3, local).
-  <b>Los artículos sin un área de estudio identificable no se muestran.</b> Puede haber errores de ubicación o de tema.</p>
+  <p class="aviso">⚠️ <b>La georreferenciación puede tener errores.</b> Si encuentras un artículo mal ubicado o con un tema
+  equivocado, avísanos a <a href="mailto:carlos.venegas@sernageomin.cl?subject=Error%20de%20georreferenciaci%C3%B3n%20-%20Bibliograf%C3%ADa%20georreferenciada">carlos.venegas@sernageomin.cl</a>
+  indicando el título del artículo.</p>
   <p><b>Dos fuentes</b>, que se encienden y apagan con los botones del panel: los artículos de <b>Andean Geology</b>
   (Revista Geológica de Chile, acceso abierto) y los de <b>otras revistas</b>. Los artículos de otras revistas pertenecen a sus
   autores y editoriales: el visor no reproduce sus resúmenes ni ofrece descargas, y «Ver en la editorial» abre el DOI.
