@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<meta name="theme-color" content="#1a5276"/>
+<meta name="description" content="Artículos científicos de geología georreferenciados según su área de estudio y simbolizados por temática."/>
+<title>Bibliografía geológica georreferenciada</title>
+<link rel="manifest" href="manifest.json"/>
+<link rel="icon" href="assets/icono.svg" type="image/svg+xml"/>
+<link rel="apple-touch-icon" href="assets/icono-192.png"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
+<style>
+  :root{--azul:#1a5276;--tinta:#1e293b;--tinta2:#475569;--muda:#64748b;--borde:#e2e8f0;--fondo:#f4f7fa}
+  html,body{margin:0;height:100%;font-family:'Segoe UI',Arial,sans-serif;-webkit-text-size-adjust:100%;background:#fff;color:var(--tinta)}
+  input,select,button{touch-action:manipulation;font-family:inherit}
+  input,select{font-size:16px}
+  html,body{overscroll-behavior:none}
+  #app{display:flex;flex-direction:column;height:100vh;height:100dvh}
+  #map{flex:1;min-height:0}
+  #panel{flex:none;display:flex;flex-direction:column;background:var(--fondo);
+         border-top:2px solid var(--azul);box-shadow:0 -3px 10px rgba(0,0,0,.13);
+         max-height:50vh;max-height:50dvh;z-index:1100}
+  #phead{flex:none;display:flex;align-items:center;gap:10px;padding:8px 12px;
+         background:#fff;border-bottom:1px solid #dbe4ec;cursor:pointer;user-select:none;min-height:48px}
+  #phead img{width:34px;height:34px;flex:none}
+  #phead h1{font-size:14px;color:var(--azul);margin:0;line-height:1.2;font-weight:700}
+  #phead h1 small{display:block;font-weight:400;color:var(--muda);font-size:11.5px}
+  .hbtn{flex:none;min-width:40px;height:36px;cursor:pointer;border:1px solid #b7c6d4;background:#eef4f9;
+        border-radius:8px;color:var(--azul);font-size:16px;font-weight:700;padding:0 8px}
+  #ptoggle{margin-left:auto;min-width:48px;font-size:19px}
+  #pbody{overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;padding:10px 12px 14px;
+         padding-bottom:calc(14px + env(safe-area-inset-bottom))}
+  #panel.collapsed #pbody{display:none}
+  .bloque{background:#fff;border:1px solid var(--borde);border-radius:8px;margin-bottom:8px;padding:9px 10px}
+  .bloque h2{font-size:13px;color:var(--azul);margin:0 0 8px;font-weight:700;display:flex;align-items:center;gap:8px}
+  .bloque h2 .acc{margin-left:auto;font-weight:400;font-size:12px}
+  .bloque h2 .acc button{border:none;background:none;color:var(--azul);cursor:pointer;text-decoration:underline;font-size:12px;padding:2px 4px}
+  #busq{width:100%;padding:8px;border-radius:8px;border:1px solid #cbd5e1;box-sizing:border-box}
+  .fila2{display:flex;gap:8px;margin-top:8px}
+  .fila2 select{flex:1;min-width:0;font-size:14px;padding:7px;border-radius:8px;border:1px solid #cbd5e1;background:#fff}
+  #temas{display:grid;grid-template-columns:1fr;gap:0}
+  .capa{display:flex;align-items:center;gap:9px;padding:5px 2px;font-size:14px;cursor:pointer;line-height:1.3}
+  .capa input{width:19px;height:19px;flex:none;accent-color:var(--azul);margin:0}
+  .capa .nom{flex:1;min-width:0}
+  .capa .n{color:var(--muda);font-size:12px}
+  .capa .solo{border:1px solid #cbd5e1;background:#fff;border-radius:6px;font-size:11px;color:var(--tinta2);
+              padding:2px 7px;cursor:pointer;flex:none}
+  .sw{width:14px;height:14px;border-radius:50%;flex:none;box-sizing:border-box}
+  .sw.anillo{background:#fff !important;border:4px solid}
+  .tam{display:inline-block;border-radius:50%;background:#94a3b8;border:2px solid #fff;box-shadow:0 0 0 1px #94a3b8;flex:none}
+  .count{color:var(--azul);font-weight:700}
+  #total{font-size:12.5px;color:var(--tinta2);margin:2px 0 0}
+  @media (min-width:900px){ #panel{max-height:44vh} #pbody{display:grid;grid-template-columns:1fr 1.4fr 1fr;gap:8px;align-items:start} #temas{grid-template-columns:1fr 1fr;column-gap:10px} }
+  @media (max-width:640px){
+    #panel{max-height:64dvh}
+    #phead h1{font-size:12.5px;flex:1;min-width:0}
+    .hbtn{height:44px;min-width:44px}
+    .capa{font-size:15px;padding:8px 2px}
+    .capa input{width:22px;height:22px}
+    .leaflet-popup-content{max-height:60vh}
+  }
+  .leaflet-popup-content{font-size:13.5px;line-height:1.5;min-width:230px;max-height:340px;overflow-y:auto;margin:12px 16px}
+  .leaflet-popup-content b.t{font-size:14px}
+  .pp .aut{color:var(--tinta2)}
+  .pp .met{color:var(--muda);font-size:12px;margin:4px 0}
+  .pp .tema{display:flex;align-items:center;gap:7px;margin:7px 0 4px;font-size:12.5px;color:var(--tinta)}
+  .pp .tema2{font-size:11.5px;color:var(--muda);margin:0 0 6px 21px}
+  .btn{display:inline-block;margin:6px 4px 0 0;font-size:12.5px;border:1px solid #9fb6cc;background:#eef4f9;
+       border-radius:8px;padding:7px 11px;text-decoration:none;color:var(--azul);font-weight:600}
+  .leaflet-tooltip.tt{font-size:12px;max-width:260px;white-space:normal;line-height:1.35}
+  .leaflet-tooltip.tt b{display:block}
+  /* clusters neutros: el color es del tema, no del grupo */
+  .cl{background:rgba(26,82,118,.18);border-radius:50%}
+  .cl div{background:#1a5276;color:#fff;border-radius:50%;width:30px;height:30px;margin:5px;
+          display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;border:2px solid #fff}
+  /* modales */
+  .modal{position:fixed;inset:0;background:rgba(15,23,42,.6);display:none;align-items:center;justify-content:center;z-index:3000;padding:16px}
+  .modal.open{display:flex}
+  .mwrap{background:#fff;border-radius:10px;max-width:460px;width:100%;max-height:88vh;overflow:auto;padding:18px 20px;position:relative;box-sizing:border-box}
+  .mclose{position:absolute;top:8px;right:10px;background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:6px 12px;cursor:pointer}
+  .mwrap h3{margin:0 0 10px;color:var(--azul);padding-right:70px}
+  .mwrap p,.mwrap li{font-size:13px;color:var(--tinta2);line-height:1.5}
+  .mwrap .fila{display:flex;align-items:center;gap:10px;margin:5px 0;font-size:13px}
+  .cita{font-size:12px;background:#f1f5f9;border-left:3px solid var(--muda);padding:6px 8px}
+  /* presentacion */
+  .tarj{display:none}.tarj.on{display:block}
+  .tarj .ico{font-size:34px}
+  .nav{display:flex;align-items:center;justify-content:space-between;margin-top:12px;gap:8px}
+  .pts{display:flex;gap:6px}.pts span{width:8px;height:8px;border-radius:50%;background:#cbd5e1}.pts span.on{background:var(--azul)}
+  .bp{border:1px solid var(--azul);background:var(--azul);color:#fff;border-radius:8px;padding:8px 14px;cursor:pointer;font-size:14px}
+  .bs{border:1px solid #cbd5e1;background:#fff;color:var(--tinta);border-radius:8px;padding:8px 14px;cursor:pointer;font-size:14px}
+  /* banner de instalacion */
+  #binst{position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:2500;background:#fff;border:1px solid #b7c6d4;
+         border-radius:10px;box-shadow:0 4px 14px rgba(0,0,0,.18);padding:8px 10px;display:none;align-items:center;gap:8px;
+         font-size:13.5px;max-width:calc(100vw - 32px);box-sizing:border-box}
+  #binst.on{display:flex}
+  #binst button{cursor:pointer}
+  #binst .x{border:none;background:none;font-size:18px;color:var(--muda);padding:4px 6px}
+  .flecha{position:fixed;top:4px;right:14px;font-size:34px;z-index:3100;display:none;animation:sube 1s infinite}
+  .flecha.on{display:block}
+  @keyframes sube{50%{transform:translateY(-8px)}}
+  /* GPS */
+  .gps{width:34px;height:34px;font-size:18px;line-height:34px;text-align:center;cursor:pointer;background:#fff}
+  .gps.on{color:#0b6bcb;background:#e0efff}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="map"></div>
+  <div id="panel">
+    <div id="phead" role="button" tabindex="0" aria-expanded="true" aria-controls="pbody" title="Mostrar u ocultar el panel">
+      <img src="assets/icono.svg" alt=""/>
+      <h1>Bibliografía geológica georreferenciada<small id="sub">Artículos científicos por área de estudio y temática</small></h1>
+      <button class="hbtn" id="bayuda" title="¿Cómo se usa?" aria-label="¿Cómo se usa?">?</button>
+      <button class="hbtn" id="binstalar" title="Instalar como app" aria-label="Instalar como app">📲</button>
+      <button class="hbtn" id="ptoggle" aria-label="Ocultar panel" title="Ocultar panel">&#9660;</button>
+    </div>
+    <div id="pbody">
+      <div class="bloque">
+        <h2>🔎 Buscar</h2>
+        <input id="busq" type="search" placeholder="Título, autor, revista o lugar…" aria-label="Buscar por título, autor, revista o lugar"/>
+        <div class="fila2">
+          <select id="decada" aria-label="Filtrar por década o año"><option value="">Todos los años</option></select>
+          <select id="conf" aria-label="Filtrar por confianza de la ubicación">
+            <option value="">Toda confianza</option>
+            <option value="alta">Solo coordenadas explícitas</option>
+          </select>
+        </div>
+        <p id="total"></p>
+      </div>
+      <div class="bloque">
+        <h2>🎨 Temática <span class="acc"><button id="todos" type="button">todas</button><button id="ninguno" type="button">ninguna</button></span></h2>
+        <div id="temas"></div>
+      </div>
+      <div class="bloque">
+        <h2>📍 Tipo de área</h2>
+        <label class="capa"><input type="checkbox" id="chk-punto" checked/><span class="tam" style="width:8px;height:8px"></span>
+          <span class="nom">Punto <span class="n">volcán, yacimiento, localidad</span></span><span class="count" id="n-punto"></span></label>
+        <label class="capa"><input type="checkbox" id="chk-regional" checked/><span class="tam" style="width:12px;height:12px"></span>
+          <span class="nom">Regional <span class="n">cuenca, cordillera, provincia</span></span><span class="count" id="n-regional"></span></label>
+        <label class="capa"><input type="checkbox" id="chk-nacional" checked/><span class="tam" style="width:16px;height:16px;opacity:.6"></span>
+          <span class="nom">Nacional <span class="n">país completo</span></span><span class="count" id="n-nacional"></span></label>
+        <button id="leybtn" class="bs" style="width:100%;margin-top:6px">ⓘ Leyenda, fuentes y licencia</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="binst" role="dialog" aria-label="Instalar la aplicación"><span style="white-space:nowrap">📲 Instala la app</span>
+  <button class="bp" id="binst-si" type="button">Instalar</button><button class="x" id="binst-x" type="button" aria-label="Cerrar">✕</button></div>
+<div class="flecha" id="flecha">⬆️</div>
+
+<div class="modal" id="mley"><div class="mwrap"><button class="mclose" data-cierra>✕ Cerrar</button>
+  <h3>Leyenda</h3>
+  <p style="margin-top:0">El <b>color</b> indica la temática principal del artículo. Cuatro temas se dibujan como <b>anillo</b>
+  (centro blanco) para distinguirlos de los de relleno del mismo tono. Pasa el cursor o toca un punto para ver su tema;
+  usa «solo» en el panel para aislar una temática.</p>
+  <div id="leytemas"></div>
+  <p>El <b>tamaño</b> indica el tipo de área: punto chico = localidad; mediano = región (al abrirlo se dibuja su recuadro);
+  grande y translúcido = país completo. Los marcadores cercanos se agrupan en un círculo azul con número.</p>
+  <h3 style="margin-top:14px">Cómo se hizo</h3>
+  <p>Artículos de la bibliografía geológica de SERNAGEOMIN. La ubicación se obtuvo del título y del resumen de cada trabajo:
+  coordenadas explícitas cuando las hay, o un nomenclátor de volcanes (Smithsonian GVP), yacimientos, regiones geológicas,
+  ciudades (GeoNames) y países (Natural Earth). Se descartaron las menciones de afiliaciones y de trabajos citados.
+  La temática se asignó comparando el texto con descripciones de cada tema (modelo de lenguaje bge-m3, local).
+  <b>Los artículos sin un área de estudio identificable no se muestran.</b> Puede haber errores de ubicación o de tema.</p>
+  <p>Los artículos pertenecen a sus autores y editoriales: este visor no reproduce resúmenes ni ofrece descargas.
+  El botón «Ver en la editorial» abre el DOI del trabajo.</p>
+  <h3 style="margin-top:14px">Licencia y cita</h3>
+  <p>La georreferenciación y la clasificación temática son obra de SERNAGEOMIN / Carlos Venegas Benavides y se distribuyen bajo
+  <a href="https://creativecommons.org/licenses/by-nc/4.0/deed.es" target="_blank" rel="noopener">CC BY-NC 4.0</a>:
+  pueden usarse citando la fuente y sin fines comerciales. Los datos bibliográficos pertenecen a sus autores y editoriales.</p>
+  <p class="cita">SERNAGEOMIN / Venegas Benavides, C. (2026). <i>Bibliografía geológica georreferenciada por área de estudio y temática</i> [conjunto de datos].</p>
+</div></div>
+
+<div class="modal" id="mayuda"><div class="mwrap"><button class="mclose" data-cierra>✕ Cerrar</button>
+  <div class="tarj on"><div class="ico">🗺️</div><h3>Artículos en el mapa</h3>
+    <p>Cada punto es un artículo científico ubicado en su área de estudio: un volcán, un yacimiento, una cuenca o un país.</p></div>
+  <div class="tarj"><div class="ico">🎨</div><h3>Color = temática</h3>
+    <p>Volcanología, tectónica, geología económica y nueve temas más. En el panel puedes apagar temas o tocar «solo» para ver uno.</p></div>
+  <div class="tarj"><div class="ico">🔎</div><h3>Busca y filtra</h3>
+    <p>Escribe un autor, un lugar o una palabra del título, y filtra por década. Los números del panel se actualizan.</p></div>
+  <div class="tarj"><div class="ico">📄</div><h3>Abre el artículo</h3>
+    <p>Toca un punto para ver título, autores y revista. «Ver en la editorial» te lleva a la página oficial del trabajo.</p></div>
+  <div class="nav"><button class="bs" id="aant" type="button">Atrás</button><div class="pts" id="apts"></div><button class="bp" id="asig" type="button">Siguiente</button></div>
+</div></div>
+
+<div class="modal" id="minst"><div class="mwrap"><button class="mclose" data-cierra>✕ Cerrar</button>
+  <h3>Instalar como app</h3>
+  <div id="pasos"></div>
+</div></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

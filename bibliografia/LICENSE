@@ -1,0 +1,33 @@
+Creative Commons Atribución-NoComercial 4.0 Internacional (CC BY-NC 4.0)
+https://creativecommons.org/licenses/by-nc/4.0/deed.es
+
+Copyright (c) 2026 SERNAGEOMIN / Carlos Venegas Benavides
+
+ALCANCE
+Esta licencia cubre el trabajo original de este repositorio: la georreferenciación de los
+artículos (ubicación, tipo de área, confianza), su clasificación temática, el código y el
+diseño del visor.
+
+NO cubre el material de terceros, que conserva sus propios derechos:
+- Los datos bibliográficos de los artículos (título, autores, año, revista, DOI) pertenecen a
+  sus autores y editoriales. Este repositorio no contiene resúmenes, textos ni archivos PDF
+  de los artículos.
+- Las librerías de terceros (Leaflet, Leaflet.markercluster) y los mapas base conservan sus
+  propias licencias.
+- Nomenclátores usados para ubicar: Smithsonian GVP, GeoNames (CC BY 4.0), Natural Earth
+  (dominio público).
+
+USTED PUEDE
+- Compartir: copiar y redistribuir el material en cualquier medio o formato.
+- Adaptar: remezclar, transformar y construir a partir del material.
+
+BAJO LAS SIGUIENTES CONDICIONES
+- Atribución: debe citar la obra como se indica abajo, enlazar esta licencia e indicar
+  si realizó cambios.
+- NoComercial: no puede usar el material con fines comerciales.
+
+CÓMO CITAR
+SERNAGEOMIN / Venegas Benavides, C. (2026). Bibliografía geológica georreferenciada por área de estudio y temática [conjunto de datos]. https://cvenegas-sernageomin.github.io/bibliografia-georref/
+
+El texto legal completo de la licencia está en:
+https://creativecommons.org/licenses/by-nc/4.0/legalcode.es
