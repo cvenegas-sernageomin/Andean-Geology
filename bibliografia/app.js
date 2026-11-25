@@ -63,6 +63,60 @@ function popupHTML(p){
   return h + '</div>';
 }
 
+/* ---------- cartas geologicas: manifest EN VIVO del repo de overlays (el mismo que lee Geonotas) ---------- */
+const CG_BASE = 'https://raw.githubusercontent.com/cvenegas-sernageomin/cartas-geologicas-sernageomin/main/';
+let CARTAS = [];
+const cartasCapa = L.layerGroup().addTo(map);
+const iconoCarta = L.divIcon({className:'', html:'<div class="mc"></div>', iconSize:[12,12], iconAnchor:[6,6]});
+function cartaHTML(c){
+  let h = '<div class="pp"><b class="t">'+esc(c.titulo)+'</b>';
+  if (c.autor) h += '<br/><span class="aut">'+esc(c.autor)+'</span>';
+  h += '<div class="met">'+[c.informe, c.escala, c.anio].filter(Boolean).map(esc).join(' · ')+'</div>';
+  h += '<div class="tema"><span class="sw mc"></span><span><b>Carta geológica</b>'+(c.region?' · '+esc(c.region):'')+'</span></div>';
+  if (c.fuente) h += '<div class="met">'+esc(c.fuente)+'</div>';
+  h += '<button type="button" class="btn" data-bajar="mapa" data-id="'+esc(c.id)+'">⬇ Mapa (JPG)</button>';
+  if (c.leyenda) h += '<button type="button" class="btn" data-bajar="leyenda" data-id="'+esc(c.id)+'">⬇ Leyenda ('+
+    esc(c.leyenda.split('.').pop().toUpperCase())+')</button>';
+  return h + '</div>';
+}
+function nombreArchivo(c, sufijo, ext){
+  return ((c.informe ? c.informe + ' ' : '') + c.titulo + sufijo).replace(/[\\/:*?"<>|]+/g, ' ').replace(/\s+/g, ' ').trim() + '.' + ext;
+}
+function guardar(blob, nombre){
+  const u = URL.createObjectURL(blob), a = document.createElement('a');
+  a.href = u; a.download = nombre; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(u), 60000);
+}
+/* el overlay publicado es WebP con transparencia: se pasa a JPG (fondo blanco) en el navegador; se limita a
+   16 MP porque Safari en iPhone no crea lienzos mas grandes (3 cartas quedan apenas reducidas) */
+async function aJPG(blob){
+  const bmp = await createImageBitmap(blob);
+  const k = Math.min(1, Math.sqrt(16e6 / (bmp.width * bmp.height)));
+  const cv = document.createElement('canvas');
+  cv.width = Math.round(bmp.width * k); cv.height = Math.round(bmp.height * k);
+  const cx = cv.getContext('2d'); cx.fillStyle = '#ffffff'; cx.fillRect(0, 0, cv.width, cv.height);
+  cx.drawImage(bmp, 0, 0, cv.width, cv.height); if (bmp.close) bmp.close();
+  const out = await new Promise(r => cv.toBlob(r, 'image/jpeg', 0.9));
+  cv.width = cv.height = 0;
+  if (!out) throw new Error('toBlob');
+  return out;
+}
+async function bajar(btn){
+  const c = CARTAS.find(x => x.id === btn.dataset.id); if (!c) return;
+  const esMapa = btn.dataset.bajar === 'mapa', ruta = esMapa ? c.overlay : c.leyenda, url = CG_BASE + ruta;
+  const txt = btn.textContent; btn.disabled = true; btn.textContent = 'Descargando…';
+  try {
+    const r = await fetch(url); if (!r.ok) throw new Error(r.status);
+    let b = await r.blob();
+    if (esMapa) { btn.textContent = 'Preparando JPG…'; b = await aJPG(b); }
+    guardar(b, nombreArchivo(c, esMapa ? '' : ' - leyenda', esMapa ? 'jpg' : ruta.split('.').pop()));
+  } catch (e) { console.warn('descarga directa fallo, se abre el archivo:', e); window.open(url, '_blank', 'noopener'); }
+  btn.disabled = false; btn.textContent = txt;
+}
+document.getElementById('map').addEventListener('click', e => {
+  const b = e.target.closest && e.target.closest('button[data-bajar]'); if (b) { e.preventDefault(); bajar(b); }
+});
+
 /* ---------- capas ---------- */
 let DATOS = null;
 const cluster = L.markerClusterGroup({
@@ -73,7 +127,7 @@ const cluster = L.markerClusterGroup({
 }).addTo(map);
 let bboxCapa = null;
 const activos = new Set(ORDEN);
-const fuentes = new Set(['andean', 'otras']);
+const fuentes = new Set(['andean', 'otras', 'cartas']);
 const fuenteDe = p => p.fuente === 'andean' ? 'andean' : 'otras';
 
 function filtrados(ignorarTema, ignorarFuente){
@@ -94,7 +148,27 @@ function filtrados(ignorarTema, ignorarFuente){
 }
 function chk(t){ return document.getElementById('chk-'+t).checked; }
 
+function cartasCumplen(){
+  const q = (document.getElementById('busq').value || '').trim().toLowerCase();
+  const dec = document.getElementById('decada').value;
+  return CARTAS.filter(c => (!dec || String(c.anio || '').startsWith(dec)) && (!q || c._busca.includes(q)));
+}
+function renderCartas(){
+  const po = popupOpts(), cumplen = cartasCumplen();
+  const lista = fuentes.has('cartas') ? cumplen : [];
+  cartasCapa.clearLayers();
+  lista.forEach(c => {
+    const b = c.bounds, m = L.marker([(b.n + b.s) / 2, (b.e + b.w) / 2], {icon:iconoCarta, keyboard:false, riseOnHover:true});
+    m.bindPopup(cartaHTML(c), po);
+    m.bindTooltip('<b>Carta geológica</b>'+esc(c.titulo), {className:'tt', direction:'top', offset:[0,-6]});
+    m.carta = c; cartasCapa.addLayer(m);
+  });
+  if (CARTAS.length) document.getElementById('n-cartas').textContent = cumplen.length;
+  return lista.length;
+}
+
 function render(){
+  const nCartas = renderCartas();
   if (!DATOS) return;
   const po = popupOpts();
   const lista = filtrados(false);
@@ -117,12 +191,19 @@ function render(){
   const porTipo = {punto:0, regional:0, nacional:0};
   lista.forEach(f => porTipo[f.properties.tipo]++);
   Object.keys(porTipo).forEach(k => document.getElementById('n-'+k).textContent = porTipo[k]);
-  document.getElementById('total').textContent = lista.length + ' de ' + DATOS.features.length + ' artículos en el mapa';
+  document.getElementById('total').textContent = lista.length.toLocaleString('es-CL') + ' de ' +
+    DATOS.features.length.toLocaleString('es-CL') + ' artículos' +
+    (CARTAS.length ? ' y ' + nCartas + ' de ' + CARTAS.length + ' cartas' : '') + ' en el mapa';
 }
 
 map.on('popupopen', e => {
-  const f = e.popup._source && e.popup._source.feature;
+  const f = e.popup._source && e.popup._source.feature, c = e.popup._source && e.popup._source.carta;
   if (bboxCapa) { bboxCapa.remove(); bboxCapa = null; }
+  if (c) {
+    const b = c.bounds;
+    bboxCapa = L.rectangle([[b.s, b.w], [b.n, b.e]],
+      {pane:'pane_bbox', color:'#1e293b', weight:2, dashArray:'6 4', fillColor:'#1e293b', fillOpacity:.06, interactive:false}).addTo(map);
+  }
   if (f && f.properties.bbox) {
     const b = f.properties.bbox, t = TEMAS[f.properties.tema];
     bboxCapa = L.rectangle([[b[0], b[2]], [b[1], b[3]]],
@@ -171,6 +252,13 @@ document.querySelector('.fuentes').addEventListener('click', e => {
 ['chk-punto','chk-regional','chk-nacional','decada','conf'].forEach(id => document.getElementById(id).addEventListener('change', render));
 let deb = null;
 document.getElementById('busq').addEventListener('input', () => { clearTimeout(deb); deb = setTimeout(render, 200); });
+
+fetch(CG_BASE + 'manifest.json', {cache:'no-cache'}).then(r => r.json()).then(m => {
+  CARTAS = (m.mapas || []).filter(c => c.bounds && c.overlay);
+  CARTAS.forEach(c => { c._busca = [c.titulo, c.informe, c.autor, c.region, c.fuente].join(' ').toLowerCase(); });
+  render();
+}).catch(e => { console.warn('No se pudo cargar el manifest de cartas:', e);
+  document.getElementById('n-cartas').textContent = 'sin conexión'; });
 
 fetch('articulos.geojson', {cache:'no-cache'}).then(r => r.json()).then(d => {
   d.features.forEach(f => { const p = f.properties;

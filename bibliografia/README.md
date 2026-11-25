@@ -5,6 +5,11 @@ coloreados según su **temática**, en dos fuentes que se encienden con un botó
 **Andean Geology** (922, acceso abierto, del [visor Andean Geology](../)) y **otras revistas** (2.885, de la
 bibliografía geológica de SERNAGEOMIN). Las cifras de abajo son de otras revistas.
 
+Un tercer botón muestra las **cartas geológicas** de SERNAGEOMIN georreferenciadas (cuadrado oscuro en el centro
+de la hoja; ~189, leídas en vivo del `manifest.json` de
+[cartas-geologicas-sernageomin](https://github.com/cvenegas-sernageomin/cartas-geologicas-sernageomin)), con título y
+descarga del mapa en JPG y de su leyenda.
+
 ## Qué muestra
 - **Color = temática** (12 temas). Cuatro temas se dibujan como anillo (centro blanco) para distinguirlos de los
   de relleno del mismo tono.

@@ -1,7 +1,7 @@
 /* Service worker: instalacion liviana (solo la cascara); los articulos se cachean al usarlos.
    Origen compartido en github.io: solo borra caches con su propio prefijo. */
 const PREFIJO = 'biblio-georref-';
-const VERSION = PREFIJO + 'v3';
+const VERSION = PREFIJO + 'v4';
 const CASCARA = ['./', 'index.html', 'app.js', 'manifest.json', 'assets/icono.svg', 'assets/icono-192.png'];
 
 self.addEventListener('install', e => {

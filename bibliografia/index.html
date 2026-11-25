@@ -57,6 +57,12 @@
   .fu .n{display:block;font-weight:400;font-size:12px}
   .fu[aria-pressed=true]{border-color:var(--azul);background:#e6eff7;color:var(--azul)}
   .fu[aria-pressed=true]::before{content:'✓ '}
+  .fu.carta{flex-basis:100%}
+  .fuentes{flex-wrap:wrap}
+  .mc{width:12px;height:12px;background:#fff;border:2.5px solid #1e293b;box-sizing:border-box;border-radius:2px;
+      box-shadow:inset 0 0 0 1.5px #fff,inset 0 0 0 4px #1e293b}
+  .sw.mc{display:inline-block;flex:none;width:14px;height:14px}
+  button.btn{cursor:pointer;font-family:inherit}
   .btn.pdf{border-color:#e0a878;background:#fff5ec;color:#a2531a}
   #total{font-size:12.5px;color:var(--tinta2);margin:2px 0 0}
   @media (min-width:900px){ #panel{max-height:44vh} #pbody{display:grid;grid-template-columns:1fr 1.4fr 1fr;gap:8px;align-items:start} #temas{grid-template-columns:1fr 1fr;column-gap:10px} }
@@ -128,10 +134,11 @@
     </div>
     <div id="pbody">
       <div class="bloque">
-        <h2>📚 Revistas</h2>
+        <h2>📚 Fuentes</h2>
         <div class="fuentes">
           <button type="button" class="fu" data-fuente="andean" aria-pressed="true">Andean Geology <span class="n" id="n-andean"></span></button>
           <button type="button" class="fu" data-fuente="otras" aria-pressed="true">Otras revistas <span class="n" id="n-otras"></span></button>
+          <button type="button" class="fu carta" data-fuente="cartas" aria-pressed="true">🗺️ Cartas geológicas <span class="n" id="n-cartas"></span></button>
         </div>
       </div>
       <div class="bloque">
@@ -181,7 +188,10 @@
   <p class="aviso">⚠️ <b>La georreferenciación puede tener errores.</b> Si encuentras un artículo mal ubicado o con un tema
   equivocado, avísanos a <a href="mailto:carlos.venegas@sernageomin.cl?subject=Error%20de%20georreferenciaci%C3%B3n%20-%20Bibliograf%C3%ADa%20georreferenciada">carlos.venegas@sernageomin.cl</a>
   indicando el título del artículo.</p>
-  <p><b>Dos fuentes</b>, que se encienden y apagan con los botones del panel: los artículos de <b>Andean Geology</b>
+  <div class="fila"><span class="sw mc"></span><span><b>Carta geológica</b>: centro de la hoja (al abrirla se dibuja su marco).
+  Trae descarga del mapa (JPG) y de su leyenda.</span></div>
+  <p><b>Tres fuentes</b>, que se encienden y apagan con los botones del panel: las <b>cartas geológicas</b> de SERNAGEOMIN
+  georreferenciadas, los artículos de <b>Andean Geology</b>
   (Revista Geológica de Chile, acceso abierto) y los de <b>otras revistas</b>. Los artículos de otras revistas pertenecen a sus
   autores y editoriales: el visor no reproduce sus resúmenes ni ofrece descargas, y «Ver en la editorial» abre el DOI.
   Los de Andean Geology enlazan a la página de la revista y a su PDF de acceso abierto.</p>
@@ -196,7 +206,8 @@
   <div class="tarj on"><div class="ico">🗺️</div><h3>Artículos en el mapa</h3>
     <p>Cada punto es un artículo científico ubicado en su área de estudio: un volcán, un yacimiento, una cuenca o un país.</p></div>
   <div class="tarj"><div class="ico">📚</div><h3>Andean Geology y otras revistas</h3>
-    <p>Arriba en el panel hay un botón para cada fuente: Andean Geology y el resto de las revistas. Enciende una, la otra o ambas.</p></div>
+    <p>Arriba en el panel hay un botón para cada fuente: Andean Geology, el resto de las revistas y las cartas geológicas
+    (cuadrado oscuro, con descarga del mapa y su leyenda). Enciende las que quieras.</p></div>
   <div class="tarj"><div class="ico">🎨</div><h3>Color = temática</h3>
     <p>Volcanología, tectónica, geología económica y nueve temas más. En el panel puedes apagar temas o tocar «solo» para ver uno.</p></div>
   <div class="tarj"><div class="ico">🔎</div><h3>Busca y filtra</h3>
