@@ -8,7 +8,7 @@ bibliografía geológica de SERNAGEOMIN). Las cifras de abajo son de otras revis
 Un tercer botón muestra las **cartas geológicas** de SERNAGEOMIN georreferenciadas (cuadrado oscuro en el centro
 de la hoja; ~189, leídas en vivo del `manifest.json` de
 [cartas-geologicas-sernageomin](https://github.com/cvenegas-sernageomin/cartas-geologicas-sernageomin)), con título y
-descarga del mapa en JPG y de su leyenda.
+descarga del mapa en JPG, de su leyenda y de un KMZ para Google Earth (mapa como GroundOverlay + leyenda como ScreenOverlay apagado; el zip se arma en el navegador).
 
 ## Qué muestra
 - **Color = temática** (12 temas). Cuatro temas se dibujan como anillo (centro blanco) para distinguirlos de los

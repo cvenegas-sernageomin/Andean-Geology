@@ -75,6 +75,7 @@ function cartaHTML(c){
   h += '<div class="tema"><span class="sw mc"></span><span><b>Carta geológica</b>'+(c.region?' · '+esc(c.region):'')+'</span></div>';
   if (c.fuente) h += '<div class="met">'+esc(c.fuente)+'</div>';
   h += '<button type="button" class="btn" data-bajar="mapa" data-id="'+esc(c.id)+'">⬇ Mapa (JPG)</button>';
+  h += '<button type="button" class="btn" data-bajar="kmz" data-id="'+esc(c.id)+'" title="Para Google Earth">⬇ KMZ</button>';
   if (c.leyenda) h += '<button type="button" class="btn" data-bajar="leyenda" data-id="'+esc(c.id)+'">⬇ Leyenda ('+
     esc(c.leyenda.split('.').pop().toUpperCase())+')</button>';
   return h + '</div>';
@@ -101,10 +102,65 @@ async function aJPG(blob){
   if (!out) throw new Error('toBlob');
   return out;
 }
+/* KMZ = zip sin compresion (las imagenes ya vienen comprimidas): doc.kml con un GroundOverlay del mapa
+   (JPG, LatLonBox = bounds del manifest, que son el marco de la hoja) y la leyenda como ScreenOverlay apagado. */
+const CRC_T = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n;
+  for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+function crc32(u8){ let c = 0xFFFFFFFF; for (let i = 0; i < u8.length; i++) c = CRC_T[(c ^ u8[i]) & 0xFF] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; }
+function zipStore(archivos){ /* [{nombre, datos:Uint8Array}] -> Blob */
+  const enc = new TextEncoder(), partes = [], central = []; let off = 0;
+  archivos.forEach(a => {
+    const nom = enc.encode(a.nombre), crc = crc32(a.datos), n = a.datos.length;
+    const h = new DataView(new ArrayBuffer(30));
+    h.setUint32(0, 0x04034b50, true); h.setUint16(4, 20, true); h.setUint16(6, 0x0800, true); h.setUint16(8, 0, true);
+    h.setUint32(14, crc, true); h.setUint32(18, n, true); h.setUint32(22, n, true); h.setUint16(26, nom.length, true);
+    partes.push(h.buffer, nom, a.datos);
+    const c = new DataView(new ArrayBuffer(46));
+    c.setUint32(0, 0x02014b50, true); c.setUint16(4, 20, true); c.setUint16(6, 20, true); c.setUint16(8, 0x0800, true);
+    c.setUint32(16, crc, true); c.setUint32(20, n, true); c.setUint32(24, n, true); c.setUint16(28, nom.length, true);
+    c.setUint32(42, off, true);
+    central.push(c.buffer, nom);
+    off += 30 + nom.length + n;
+  });
+  const tamC = central.reduce((s, x) => s + x.byteLength, 0);
+  const e = new DataView(new ArrayBuffer(22));
+  e.setUint32(0, 0x06054b50, true); e.setUint16(8, archivos.length, true); e.setUint16(10, archivos.length, true);
+  e.setUint32(12, tamC, true); e.setUint32(16, off, true);
+  return new Blob([...partes, ...central, e.buffer], {type:'application/vnd.google-earth.kmz'});
+}
+function xml(t){ return String(t == null ? '' : t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+async function armarKMZ(c, btn){
+  const r = await fetch(CG_BASE + c.overlay); if (!r.ok) throw new Error(r.status);
+  btn.textContent = 'Preparando KMZ…';
+  const mapa = new Uint8Array(await (await aJPG(await r.blob())).arrayBuffer());
+  let ley = null, extLey = '';
+  if (c.leyenda) { try { const rl = await fetch(CG_BASE + c.leyenda);
+    if (rl.ok) { ley = new Uint8Array(await rl.arrayBuffer()); extLey = c.leyenda.split('.').pop(); } } catch (_) {} }
+  const b = c.bounds, desc = [c.autor, [c.informe, c.escala, c.anio].filter(Boolean).join(' · '), c.region, c.fuente]
+    .filter(Boolean).map(xml).join('<br/>');
+  const kml = '<?xml version="1.0" encoding="UTF-8"?>\n<kml xmlns="http://www.opengis.net/kml/2.2"><Document>' +
+    '<name>' + xml((c.informe ? c.informe + ' ' : '') + c.titulo) + '</name><description><![CDATA[' + desc +
+    '<br/>Georreferenciación: SERNAGEOMIN. Puede tener errores: carlos.venegas@sernageomin.cl]]></description>' +
+    '<GroundOverlay><name>Mapa</name><Icon><href>files/mapa.jpg</href></Icon>' +
+    '<LatLonBox><north>' + b.n + '</north><south>' + b.s + '</south><east>' + b.e + '</east><west>' + b.w + '</west></LatLonBox>' +
+    '</GroundOverlay>' +
+    (ley ? '<ScreenOverlay><name>Leyenda</name><visibility>0</visibility><Icon><href>files/leyenda.' + extLey + '</href></Icon>' +
+      '<overlayXY x="0" y="1" xunits="fraction" yunits="fraction"/><screenXY x="0.01" y="0.99" xunits="fraction" yunits="fraction"/>' +
+      '<size x="0" y="0.9" xunits="fraction" yunits="fraction"/></ScreenOverlay>' : '') +
+    '</Document></kml>';
+  const arch = [{nombre:'doc.kml', datos:new TextEncoder().encode(kml)}, {nombre:'files/mapa.jpg', datos:mapa}];
+  if (ley) arch.push({nombre:'files/leyenda.' + extLey, datos:ley});
+  return zipStore(arch);
+}
 async function bajar(btn){
   const c = CARTAS.find(x => x.id === btn.dataset.id); if (!c) return;
   const esMapa = btn.dataset.bajar === 'mapa', ruta = esMapa ? c.overlay : c.leyenda, url = CG_BASE + ruta;
   const txt = btn.textContent; btn.disabled = true; btn.textContent = 'Descargando…';
+  if (btn.dataset.bajar === 'kmz') {
+    try { guardar(await armarKMZ(c, btn), nombreArchivo(c, '', 'kmz')); }
+    catch (e) { console.warn('KMZ fallo:', e); alert('No se pudo armar el KMZ: ' + e.message); }
+    btn.disabled = false; btn.textContent = txt; return;
+  }
   try {
     const r = await fetch(url); if (!r.ok) throw new Error(r.status);
     let b = await r.blob();
